@@ -1,9 +1,6 @@
 # Make sure that we are using eventGridEvent for parameter binding in Azure function.
 param($eventGridEvent, $TriggerMetadata)
 
-Connect-AzAccount -Identity
-
-
 # Connecting to the table storage
 $StorageAccountName = "rgpatchtest01806d" # Enter the name of the storage account e.g. "BrendgStorage"
 $StorageAccountRg = "rg-patch-test-01"

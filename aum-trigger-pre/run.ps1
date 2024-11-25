@@ -3,8 +3,6 @@ param($eventGridEvent, $TriggerMetadata)
 # # Make sure to pass hashtables to Out-String so they're logged correctly
 $eventGridEvent | Out-String | Write-Host
 
-Connect-AzAccount -Identity
-
 # Connecting to the table storage
 $StorageAccountName = "rgpatchtest01806d" # Enter the name of the storage account e.g. "BrendgStorage"
 $StorageAccountRg = "rg-patch-test-01"
