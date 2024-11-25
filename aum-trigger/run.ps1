@@ -22,7 +22,7 @@ if ($resourceSubscriptionIds.Count -eq 0) {
     break
 }
 
-Write-Output "Querying ARG to get machine details [MaintenanceRunId=$maintenanceRunId][ResourceSubscriptionIdsCount=$($resourceSubscriptionIds.Count)]"
+Write-Output "Querying ARG to get machine details [MaintenanceRunId=$maintenanceRunId][ResourceSubscriptionIdsCount=$($resourceSubscriptionIds)]"
 
 $argQuery = @"
     maintenanceresources 
@@ -86,7 +86,7 @@ if ($jobsList)
 
 foreach($id in $jobsList)
 {
-    $vmRow = Get-AzTableRowByPartitionKeyRowKey -Table $Table -PartitionKey $PartitionKey -RowKey $id
+    $vmRow = Get-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $id
     $job = Get-Job -Id $id
     if ($job.Error)
     {
@@ -95,7 +95,7 @@ foreach($id in $jobsList)
         $vmRow | Update-AzTableRow -Table $Table
     }
     else {
-        $vmRow.State = 'Started'
+        $vmRow.State = "Started"
         $vmRow | Update-AzTableRow -Table $Table
     }
 }
