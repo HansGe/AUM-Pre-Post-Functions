@@ -2,11 +2,11 @@
 # See https://aka.ms/functionsmanageddependency for additional information.
 #
 @{
-    'AZ.Storage'='8.0.*'
-    'Az.ResourceGraph'='1.0.*' 
-    'Az.Resources'='6.0.*'
-    'Az.Accounts'='4.0.*'
-    'Az.Compute'='9.0.*'
+    'AZ.Storage'='8.*'
+    'Az.ResourceGraph'='1.*' 
+    'Az.Resources'='6.*'
+    'Az.Accounts'='4.*'
+    'Az.Compute'='9.*'
     'AzTable' = '2.*' 
     'ThreadJob' = '2.*'
 }
