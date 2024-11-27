@@ -15,7 +15,7 @@ $Time = Get-Date
 
 # $maintenanceRunId = $eventGridEvent.data.CorrelationId
 # $resourceSubscriptionIds = $eventGridEvent.data.ResourceSubscriptionIds
-
+$jobIDs= New-Object System.Collections.Generic.List[System.Object]
 $preStoppedMachines = Get-AzTableRow -Table $Table
 
 $preStoppedMachines | ForEach-Object {
