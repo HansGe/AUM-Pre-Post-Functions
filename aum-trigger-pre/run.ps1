@@ -6,9 +6,12 @@ $eventGridEvent | Out-String | Write-Host
 # Connecting to the table storage
 $StorageAccountName = "rgpatchtest01806d" # Enter the name of the storage account e.g. "BrendgStorage"
 $StorageAccountRg = "rg-patch-test-01"
+$TableName = "VmState"
+
+
 $Key = Get-AzStorageAccountKey -ResourceGroupName $StorageAccountRg -Name $StorageAccountName
 $StorageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $Key[0].Value # Connect to the Storage Account
-$Table = (Get-AzStorageTable -Context $StorageContext | where {$_.name -eq "VmState"}).CloudTable # Connect to the VM State table
+$Table = (Get-AzStorageTable -Context $StorageContext | where {$_.name -eq $TableName}).CloudTable # Connect to the VM State table
 $PartitionKey = "1"
 $Time = Get-Date
 
