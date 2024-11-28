@@ -16,12 +16,12 @@ $Time = Get-Date
 # $maintenanceRunId = $eventGridEvent.data.CorrelationId
 # $resourceSubscriptionIds = $eventGridEvent.data.ResourceSubscriptionIds
 $jobIDs= New-Object System.Collections.Generic.List[System.Object]
-$preStoppedMachines = Get-AzTableRow -Table $Table
+$preStoppedMachines = Get-AzTableRow -Table $Table -CustomFilter "(State eq 'Started') and (JobId eq 'Ok')"
 
 $preStoppedMachines | ForEach-Object {
     $vmId = $_.Id
     $vmState = $_.State
-    $vmRow = Get-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $_.RowKey
+    $vmRow = $_
 
     $split = $vmId -split "/";
     $subscriptionId = $split[2]; 
@@ -35,10 +35,12 @@ $preStoppedMachines | ForEach-Object {
 if ($vmState = "started") {
     Write-Output "Stopping '$($name)' ..."
 
-    Remove-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $_.RowKey
-
     $newJob = Start-ThreadJob -ScriptBlock { param($resource, $vmname, $sub) $context = Set-AzContext -Subscription $sub; Stop-AzVM -ResourceGroupName $resource -Name $vmname -Force -DefaultProfile $context} -ArgumentList $rg, $name, $subscriptionId
-    Add-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $newJob.Id -property @{"DateTime"=$Time.DateTime;"VmName"=$name;"RgName"=$rg;"SubID"=$subscriptionId;"ID"=$vmId;"State"="Starting"}
+    
+    $vmRow.State = "Stopping"
+    $vmRow.JobId = $newJob.Id
+    $vmRow | Update-AzTableRow -Table $Table
+    
     $jobIDs.Add($newJob.Id)
 }
 
@@ -53,15 +55,16 @@ if ($jobsList)
 
 foreach($id in $jobsList)
 {
-    $vmRow = Get-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $id
+    $vmRow = Get-AzTableRow -Table $Table -CustomFilter "(JobId eq $id) and (State eq 'Stopping')"
     $job = Get-Job -Id $id
     if ($job.Error)
     {
         Write-Output $job.Error
         $vmRow.State = $job.Error
+        $vmRow.JobId = "Error"
         $vmRow | Update-AzTableRow -Table $Table
     }
     else {
-        Remove-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $id
+        $vmRow | Remove-AzTableRow -Table $Table
     }
 }

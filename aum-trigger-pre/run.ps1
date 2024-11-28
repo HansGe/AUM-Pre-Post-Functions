@@ -68,7 +68,7 @@ $allMachines | ForEach-Object {
         Write-Output "Starting '$($name)' ..."
 
         $newJob = Start-ThreadJob -ScriptBlock { param($resource, $vmname, $sub) $context = Set-AzContext -Subscription $sub; Start-AzVM -ResourceGroupName $resource -Name $vmname -DefaultProfile $context} -ArgumentList $rg, $name, $subscriptionId
-        Add-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $newJob.Id -property @{"DateTime"=$Time.DateTime;"VmName"=$name;"RgName"=$rg;"SubID"=$subscriptionId;"ID"=$vmId;"State"=$state}
+        Add-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey (Get-Date).Ticks -property @{"JobId"=$newJob.id;"DateTime"=$Time.DateTime;"VmName"=$name;"RgName"=$rg;"SubID"=$subscriptionId;"ID"=$vmId;"State"=$state}
         $jobIDs.Add($newJob.Id)
     } else {
         Write-Output ($name + ": no action taken. State: " + $state) 
@@ -84,16 +84,18 @@ if ($jobsList)
 
 foreach($id in $jobsList)
 {
-    $vmRow = Get-AzTableRow -Table $Table -PartitionKey $PartitionKey -RowKey $id
+    $vmRow = Get-AzTableRow -Table $Table -CustomFilter "(JobId eq $id)"
     $job = Get-Job -Id $id
     if ($job.Error)
     {
         Write-Output $job.Error
         $vmRow.State = $job.Error
+        $vmRow.JobId = "Error"
         $vmRow | Update-AzTableRow -Table $Table
     }
     else {
         $vmRow.State = "Started"
+        $vmRow.JobId = "Ok"
         $vmRow | Update-AzTableRow -Table $Table
     }
 }
