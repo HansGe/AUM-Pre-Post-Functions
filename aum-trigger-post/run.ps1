@@ -2,9 +2,9 @@
 param($eventGridEvent, $TriggerMetadata)
 
 # Connecting to the table storage
-$StorageAccountName = "rgpatchtest01806d" # Enter the name of the storage account e.g. "BrendgStorage"
-$StorageAccountRg = "rg-patch-test-01"
-$TableName = "VmState"
+$StorageAccountName = $env:StorageAccount
+$StorageAccountRg = $env:StorageAccountRg
+$TableName = $env:TableName
 
 
 $Key = Get-AzStorageAccountKey -ResourceGroupName $StorageAccountRg -Name $StorageAccountName
