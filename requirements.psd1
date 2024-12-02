@@ -9,4 +9,5 @@
     'Az.Compute'='9.*'
     'AzTable' = '2.*' 
     'ThreadJob' = '2.*'
+    'Az.DesktopVirtualization' = '2.*'
 }
