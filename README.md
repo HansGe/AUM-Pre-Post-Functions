@@ -5,3 +5,13 @@
 - Managed identity need Virtual Machine Contributor on Virtual machines to start and stop virtual machines
 - Managed identity need Storage Table Data Contributor on storage account to write states to the table
 - Managed identity need Desktop Virtualization Host Pool Contributor on hostpool to disable the scaling plan
+
+
+# Environment variables
+- add following environment variables  
+    - StorageAccount
+    - StorageAccountRg
+    - TableName
+
+- add following environment variable for AVD scaling plans
+    - AvdTableName
